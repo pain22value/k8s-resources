@@ -1,0 +1,34 @@
+# gateway-service의 기본값을 설정합니다.
+
+# 디플로이먼트에서 생성할 파드(Pod)의 개수
+replicaCount: 1
+
+# 사용할 도커 이미지 정보
+image:
+  repository: kye8780/api-gateway 
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# 서비스를 클러스터 내부에 노출할 방식과 포트 설정
+service:
+  type: ClusterIP
+  port: 8080
+
+# 외부 트래픽을 서비스로 연결해주는 인그레스(Ingress) 설정
+ingress:
+  enabled: true 
+  hosts:
+    - host: gateway.truve.com
+      paths:
+        - path:
+          pathType: ImplementationSpecific
+
+# 환경변수 설정을 위한 ConfigMap 값
+# 다른 서비스들과의 통신을 위한 주소 정보입니다.
+config:
+  auth_server_uri: "http://auth-service:8081"
+  payment_server_uri: "http://payment-service:8082"
+  queue_server_uri: "http://queue-service:8083"
+  ticketing_server_uri: "http://ticketing-service:8084"
+  user_redis_host: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com"
+  user_redis_port: "6379"
