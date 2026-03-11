@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-musical-service
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: musical-service
+  template:
+    metadata:
+      labels:
+        app: musical-service
+    spec:
+      containers:
+        - name: musical-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          
+          env:
+            {{- range $key, $value := .Values.config }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: SERVER_PORT
+              value: {{ .Values.service.port | quote }}
+
+          envFrom:
+            - secretRef:
+                name: {{ .Release.Name }}-musical-secrets
+
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ .Release.Name }}-musical-config
