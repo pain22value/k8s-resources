@@ -34,4 +34,3 @@ config:
   musical_server_uri: "http://musical-service.truve-musical-service.svc.cluster.local:8085"
   user_redis_host: "truve-cache-prod.hjxi0v.clustercfg.apn2.cache.amazonaws.com"
   user_redis_port: "6379"
-  jwt_secret: "truve-secret-key"
