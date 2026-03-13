@@ -41,7 +41,10 @@ spec:
             - name: USER_REDIS_PORT
               value: {{ .Values.config.user_redis_port | quote }}
             - name: JWT_SECRET
-              value: {{ .Values.config.jwt_secret | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-gateway-secrets
+                  key: JWT_SECRET
 
             - name: SPRINGDOC_SWAGGER_UI_URLS_0_NAME
               value: "01-Auth Service"
@@ -61,9 +64,14 @@ spec:
             - name: SPRINGDOC_SWAGGER_UI_URLS_3_NAME
               value: "04-Ticketing Service"
             - name: SPRINGDOC_SWAGGER_UI_URLS_3_URL
-              value: "/api/ticketing/v3/api-docs"
+              value: "/api/ticketing/v3/api-docs/ticketing"
 
             - name: SPRINGDOC_SWAGGER_UI_URLS_4_NAME
-              value: "05-Musical Service"
+              value: "05-Booking Service"
             - name: SPRINGDOC_SWAGGER_UI_URLS_4_URL
+              value: "/api/ticketing/v3/api-docs/booking"
+
+            - name: SPRINGDOC_SWAGGER_UI_URLS_5_NAME
+              value: "06-Musical Service"
+            - name: SPRINGDOC_SWAGGER_UI_URLS_5_URL
               value: "/api/shows/v3/api-docs"
