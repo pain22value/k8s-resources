@@ -1,0 +1,16 @@
+# IDEs
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+node_modules/
