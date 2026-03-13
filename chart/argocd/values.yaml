@@ -45,24 +45,45 @@ argo-cd:
     notifiers:
       service.slack: |
         token: $slack-token
-    
+
     subscriptions:
       - receiver: C0AKYEYK86Q
         notifiers: [slack]
-        triggers: [on-sync-succeeded, on-sync-failed, on-health-degraded]
+        triggers: [on-sync-running, on-sync-succeeded, on-sync-failed, on-health-degraded]
 
     triggers:
+      # 1. 동기화 시작 시 (Sync 버튼을 눌러 배포가 시작됨)
+      trigger.on-sync-running: |
+        - when: app.status.operationState != nil and app.status.operationState.phase in ['Running']
+          send: [app-sync-running]
+      # 2. 동기화 실패 시 (배포 중 에러 발생)
       trigger.on-sync-failed: |
         - when: app.status.operationState != nil and app.status.operationState.phase in ['Error', 'Failed']
           send: [app-sync-failed]
+      # 3. 동기화 성공 시 (배포가 정상적으로 완료됨)
       trigger.on-sync-succeeded: |
         - when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded']
           send: [app-sync-succeeded]
+      # 4. 애플리케이션 상태 악화 시 (배포는 끝났으나 Pod가 죽거나 헬스체크 실패 등)
       trigger.on-health-degraded: |
         - when: app.status.health.status == 'Degraded'
           send: [app-health-degraded]
 
     templates:
+      # 동기화 시작 메시지 (하늘색)
+      template.app-sync-running: |
+        message: |
+          Application {{.app.metadata.name}} sync is running.
+        slack:
+          attachments: |
+            [{
+              "title": "{{ .app.metadata.name }}",
+              "color": "#85C1E9",
+              "fields": [
+                { "title": "Sync Status", "value": "Running", "short": true }
+              ]
+            }]
+      # 동기화 성공 메시지 (초록색)
       template.app-sync-succeeded: |
         message: |
           Application {{.app.metadata.name}} has been successfully synced.
@@ -77,6 +98,7 @@ argo-cd:
                 { "title": "Health Status", "value": "{{ .app.status.health.status }}", "short": true }
               ]
             }]
+      # 동기화 실패 메시지 (빨간색)
       template.app-sync-failed: |
         message: |
           Application {{.app.metadata.name}} sync has failed.

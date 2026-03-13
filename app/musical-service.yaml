@@ -4,6 +4,7 @@ metadata:
   name: musical-service
   namespace: argocd
   annotations:
+    notifications.argoproj.io/subscribe.on-sync-running.slack: C0AKYEYK86Q
     notifications.argoproj.io/subscribe.on-sync-succeeded.slack: C0AKYEYK86Q
     notifications.argoproj.io/subscribe.on-sync-failed.slack: C0AKYEYK86Q
     notifications.argoproj.io/subscribe.on-health-degraded.slack: C0AKYEYK86Q
